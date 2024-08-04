@@ -55,6 +55,7 @@
   border: 1px solid #808080;
   border-radius: 4px;
   width: 272px;
+
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;
   font-size: 16px;
@@ -74,8 +75,9 @@
 .form-gallery {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-top: 20px;
+  margin-bottom: 32px;
 }
 
 .image-size {
@@ -174,7 +176,7 @@
 .load-button {
   border-radius: 8px;
   padding: 8px 16px;
-  width: 91px;
+
   height: 40px;
   border: none;
   background: #4e75ff;
@@ -184,6 +186,10 @@
   letter-spacing: 0.04em;
   color: #fff;
   font-family: 'Montserrat', sans-serif;
+}
+
+.load-button:hover {
+  background: #6c8cff;
 }
 
 .hidden {
