@@ -10,13 +10,15 @@ const loader = document.querySelector('.loader');
 const button = document.querySelector('.load');
 const message = document.querySelector('.bottom');
 
+const per_page = 15;
+
 let page = 1;
 let wordFromStart = '';
 
 form.addEventListener('submit', handleSubmit);
 button.addEventListener('click', handleClick);
 
-function handleSubmit(event) {
+async function handleSubmit(event) {
   clearImages();
   event.preventDefault();
   loader.classList.remove('hidden');
@@ -32,7 +34,8 @@ function handleSubmit(event) {
     loader.classList.add('hidden');
     return;
   }
-  searchImagesByQuery(`${wordForSearch}`, page).then(async data => {
+  try {
+    const data = await searchImagesByQuery(wordForSearch, page, per_page);
     if (data.total === 0) {
       iziToast.error({
         position: 'topRight',
@@ -45,7 +48,7 @@ function handleSubmit(event) {
       await createImages(data);
       button.classList.remove('hidden');
     }
-    if (data.hits.length < 15) {
+    if (data.hits.length < per_page) {
       button.classList.add('hidden');
       message.classList.add('show-text');
       iziToast.info({
@@ -54,36 +57,39 @@ function handleSubmit(event) {
       });
     }
     loader.classList.add('hidden');
-  });
+  } catch (error) {
+    iziToast.error({
+      position: 'topRight',
+      message: error.message,
+    });
+    loader.classList.add('hidden');
+  }
 }
 
-function handleClick(event) {
+async function handleClick(event) {
   page += 1;
   loader.classList.remove('hidden');
   button.classList.add('hidden');
-  searchImagesByQuery(`${wordFromStart}`, page)
-    .then(data => {
-      if (data.hits.length < 15) {
-        button.classList.add('hidden');
-        message.classList.add('show-text');
-        iziToast.info({
-          position: 'topRight',
-          message: "We're sorry, but you've reached the end of search results.",
-        });
-        loader.classList.add('hidden');
-        button.classList.add('hidden');
-      } else {
-        button.classList.remove('hidden');
-      }
-      createImages(data);
-      scrollDown();
-      loader.classList.add('hidden');
-    })
-    .catch(error => {
-      iziToast.error({
+  try {
+    const data = await searchImagesByQuery(wordFromStart, page, per_page);
+    if (data.hits.length < per_page) {
+      button.classList.add('hidden');
+      message.classList.add('show-text');
+      iziToast.info({
         position: 'topRight',
-        message: error.message,
+        message: "We're sorry, but you've reached the end of search results.",
       });
-      loader.classList.add('hidden');
+    } else {
+      button.classList.remove('hidden');
+    }
+    await createImages(data);
+    scrollDown();
+    loader.classList.add('hidden');
+  } catch (error) {
+    iziToast.error({
+      position: 'topRight',
+      message: error.message,
     });
+    loader.classList.add('hidden');
+  }
 }
